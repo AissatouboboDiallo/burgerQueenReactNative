@@ -13,18 +13,11 @@ import { setCommandesRealtime } from '../../store/redux/commandesSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { subscribeToCommandes } from '../../services/commandesServices';
 import ModalAjouterCommande from './Components/cuisine/ModalAjouterCommande';
+import Servi from './Components/cuisine/Servi';
 
 
 
 export default function Cuisine() {
-
-    const [filtre1, setfiltre] = useState(0); // État pour suivre l'onglet actif
-      const listFiltre = [
-        { label: 'Toutes', nbre: 4, value: 0, conponent : < Toutes /> },
-        { label: 'En attente', nbre: 2, value: 1, conponent: < Attentes /> },
-        { label: 'En cuisson', nbre: 2, value: 2, conponent: < Cuisson />},
-        { label: 'Prêtes', nbre: 0, value: 3,conponent:< Pretes />  },
-      ]
 
       const [modalCommandeVisible, setModalCommandeVisible] = useState(false);
       const dispatch = useDispatch()
@@ -37,6 +30,22 @@ export default function Cuisine() {
             });
             return () => unsubscribe();
         }, []);
+
+        const totalCommandes = commandes.length;
+        const commandesEnAttente = commandes.filter((cmd) => cmd.status === 'attente').length;
+        const commandesEnCuisson = commandes.filter((cmd) => cmd.status === 'cuisson').length;
+        const commandesPretes = commandes.filter((cmd) => cmd.status === 'prete').length;
+        const cmdServi = commandes.filter((cmd) => cmd.status === 'servi').length;
+
+
+        const [filtre1, setfiltre] = useState(0); // État pour suivre l'onglet actif
+        const listFiltre = [
+        { label: 'Toutes', nbre: totalCommandes, value: 0, component: <Toutes /> },
+        { label: 'En attente', nbre: commandesEnAttente, value: 1, component: <Attentes /> },
+        { label: 'En cuisson', nbre: commandesEnCuisson, value: 2, component: <Cuisson /> },
+        { label: 'Prêtes', nbre: commandesPretes, value: 3, component: <Pretes /> },
+        { label: 'Servi', nbre: cmdServi, value: 4, component: <Servi /> },
+    ];
 
   return (
      <View style={styles.container}>
@@ -68,7 +77,7 @@ export default function Cuisine() {
         <View style = {{width:"100%",height:510}}>
         <ScrollView showsVerticalScrollIndicator={false} >
             
-             {listFiltre[filtre1].conponent}  
+             {listFiltre[filtre1].component}  
         </ScrollView>
 
 

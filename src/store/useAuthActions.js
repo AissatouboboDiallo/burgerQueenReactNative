@@ -3,7 +3,8 @@ import { useDispatch } from 'react-redux';
 import {logout} from './authSlice';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import {doc,updateDoc} from 'firebase/firestore';
-import { auth, db } from 'firebase/auth';
+import {auth, db } from '../../firebaseConfig';
+import { deleteUserAccount } from '../services/autServices';
 
 export function useAuthActions() {
   const dispatch = useDispatch();
@@ -104,24 +105,53 @@ const handleVerifyCode = async (uid, codeEntreParLUtilisateur) => {
   }
 };
 
-  const handleLogout = () => {
+ const getFirebaseErrorMessage = (errorCode) => {
+    switch (errorCode) {
+        case 'auth/email-already-in-use':
+            return 'Cette adresse e-mail est déjà utilisée par un autre compte.';
+        case 'auth/invalid-email':
+            return "L'adresse e-mail saisie n'est pas valide.";
+        case 'auth/weak-password':
+            return 'Le mot de passe doit contenir au moins 6 caractères.';
+        case 'auth/operation-not-allowed':
+            return "L'inscription par e-mail/mot de passe n'est pas activée. Contacte l'administrateur.";
+        case 'auth/network-request-failed':
+            return 'Problème de connexion internet. Vérifie ta connexion et réessaie.';
+        case 'auth/too-many-requests':
+            return 'Trop de tentatives. Merci de patienter quelques minutes avant de réessayer.';
+        case 'auth/internal-error':
+            return "Une erreur interne est survenue. Réessaie dans un instant.";
+        default:
+            return "Une erreur inattendue est survenue . Réessaie.";
+    }
+}; 
+
+
+const handleDeleteAccount = async (email, password) => {
     Alert.alert(
-      "Déconnexion",
-      "Êtes-vous sûr de vouloir vous déconnecter ?",
-      [
-        {
-          text: "Non",
-          style: "cancel"
-        },
-        {
-          text: "Oui",
-          onPress: () => dispatch(logout())
-        }
-      ]
+        'Supprimer le compte',
+        'Cette action est irréversible. Es-tu sûre de vouloir continuer ?',
+        [
+            { text: 'Annuler', style: 'cancel' },
+            {
+                text: 'Supprimer',
+                style: 'destructive',
+                onPress: async () => {
+                    try {
+                        await deleteUserAccount(email, password);
+                        Alert.alert('Compte supprimé avec succès.');
+                        // rediriger vers l'écran de connexion
+                    } catch (error) {
+                        const message = getFirebaseErrorMessage(error.code);
+                        Alert.alert('Erreur', message);
+                    }
+                },
+            },
+        ]
     );
-  };
+};
 
   // On retourne la fonction pour que les composants puissent l'utiliser
-  return { handleLogout , handleLogin, handleVerifyCode };
+  return {handleLogin, handleVerifyCode, getFirebaseErrorMessage, handleDeleteAccount };
 
 }

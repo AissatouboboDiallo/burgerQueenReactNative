@@ -12,18 +12,11 @@ function RootNavigator() {
   // On récupère l'utilisateur connecté dans Redux
   const user = useSelector((state) => state.auth.user);
 
-  // 1. Si aucun utilisateur n'est connecté -> Écran de Connexion / Inscription
-  if (!user) {
-    return <LoginScreen />;
-  }
-
-  // 2. Si l'utilisateur est connecté, on l'oriente selon son rôle
-  if (user.role === 'manager') {
+// s'il est connecté alors on lui redirige vers la bonne page
+  if (user) {
     return <ManagerDashboard />;
-  } else if (user.role === 'cuisinier') {
-    return <CuisinierDashboard />;
   } else {
-    // Optionnel : Cas de secours si le rôle n'est pas reconnu
+    // sinon vers le login 
     return <LoginScreen />;
   }
 

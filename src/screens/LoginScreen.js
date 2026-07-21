@@ -3,7 +3,7 @@ import {StyleSheet, View, TextInput, Button, Text,TouchableOpacity,KeyboardAvoid
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActivityIndicator, Alert } from 'react-native';
 import {useEffect} from 'react';
-// Importer les fonctions nécessaires de Redux
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { useDispatch } from 'react-redux';
 import { login } from '../store/authSlice';
@@ -26,6 +26,13 @@ export default function LoginScreen() {
   const [nom, setNom] = useState(''); // Nouveau champ pour l'inscription
 
   const dispatch = useDispatch();
+  const {getFirebaseErrorMessage} = useAuthActions()
+
+ const handleChangeNom = (value) => {
+    // Autorise uniquement les lettres (avec accents), espaces, tirets et apostrophes
+    const filtered = value.replace(/[^a-zA-ZÀ-ÿ\s'-]/g, '');
+    setNom(filtered);
+}; 
 
 const handleLogin = async () => {
 
@@ -64,7 +71,8 @@ const handleLogin = async () => {
             }
 
    } catch (error) {
-        Alert.alert('Problème de réseau', "Veuillez réessayez ultérieurement ! ");
+        const message = getFirebaseErrorMessage(error.code);
+       Alert.alert('Erreur d\'inscription', message);
     } finally {
         setLoading(false); // Arrête le chargement
     }
@@ -74,6 +82,11 @@ const handleRegister = async () => {
     if (!nom || !email || !password) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs pour l\'inscription.');
       return;
+    }
+    const nomValide = /^[a-zA-ZÀ-ÿ\s'-]{2,50}$/.test(nom.trim());
+    if (!nomValide) {
+        Alert.alert('Nom invalide', 'Le nom doit contenir entre 2 et 50 lettres, sans chiffres ni caractères spéciaux.');
+        return;
     }
     if (password.length < 6) {
       Alert.alert('Erreur', 'Le mot de passe doit contenir au moins 6 caractères.');
@@ -102,7 +115,8 @@ const handleRegister = async () => {
         setActiveTab('connexion'); // On bascule automatiquement sur l'onglet connexion après l'inscription
 
     } catch (error) {
-        Alert.alert('Erreur de création de compte', error.message);
+        const message = getFirebaseErrorMessage(error.code);
+        Alert.alert('Erreur d\'inscription', message);
     } finally {
         setLoading(false);
     }
@@ -120,7 +134,10 @@ return (
         {/* Logo Couronne */}
         <View style={styles.logoContainer}>
           <View style={styles.logoBackground}>
-            <Text style={styles.logoEmoji}>👑</Text>
+            <Text style={styles.logoEmoji}>
+             <MaterialCommunityIcons name="crown-outline" size={60} />
+              
+            </Text>
           </View>
           <Text style={styles.title}>
             Burger <Text style={styles.titleHighlight}>Queen</Text>
@@ -163,7 +180,7 @@ return (
                   placeholder="Jean Dupont"
                   placeholderTextColor="#9CA3AF"
                   value={nom}
-                  onChangeText={setNom}
+                  onChangeText={handleChangeNom}
                 />
               </View>
             </>

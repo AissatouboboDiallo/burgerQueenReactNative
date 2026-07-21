@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   containerAppBar:{
   width: '100%',
     maxWidth: 448,
-    marginBottom: 16,
+    marginBottom: 0,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',

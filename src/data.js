@@ -179,3 +179,77 @@ export const mockProduits = [
         disponible: true, // calculé "à la main" pour l'instant, en dur
     },
 ];
+
+export const preferences = [
+  {
+    id:1 ,
+    title : "Notifications push",
+    icon:"bell-badge-outline",
+    text : "Nouvelles commandes et alertes",
+    actif:true,
+  } , 
+   {
+    id:2 ,
+    icon:"bell-badge-outline",
+    title : "Sons d'alerte",
+    text : "Ding à chaque commande",
+    actif:true,
+  } , 
+   {
+    id:3 ,
+    icon:"moon-waning-crescent",
+    title : "Mode Sombre",
+    text : "Interface adapté au service du soir",
+    actif:false,
+
+  } , 
+   {
+    id:4 ,
+    icon:"earth",
+    title : "Langue",
+    text : "Français",
+    actif:false,
+
+  } , 
+
+]
+
+export const support = [
+   {
+    id:1,
+    icon:"help-circle-outline",
+    title : "Centre d'aide ",
+    text : "",
+    actif:true,
+
+  } , 
+   {
+    id:2 ,
+    icon:"information-outline",
+    title : "A propos de BurgerQueen",
+    text : "v1.0.0",
+    actif:true,
+
+  } , 
+
+]
+
+export const comptes = [
+   {
+    id:1 ,
+    icon:"account-edit-outline",
+    title : "Modifier le profil",
+    text : "",
+    actif:false,
+
+  } , 
+   {
+    id:2 ,
+    icon:"shield-lock-outline",
+    title : "Sécurité & mot de passe",
+    text : "",
+    actif:true,
+
+  } , 
+
+]

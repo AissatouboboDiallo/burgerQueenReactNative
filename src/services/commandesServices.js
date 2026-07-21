@@ -30,7 +30,10 @@ export const subscribeToCommandes = (callback) => {
             return {
                 id: doc.id,
                 ...data,
-                dateCommande: data.dateCommande ? data.dateCommande.toMillis() : null,
+                createdAt: data.createdAt ? data.createdAt.toMillis() : null,
+                updatedAt: data.updatedAt ? data.updatedAt.toMillis() : null,
+
+
             };
         });
         callback(commandes);
@@ -53,6 +56,6 @@ export const searchCommandes = async (commandeId, searchs) => {
 
 // DELETE — supprimer un Ingredients
 export const deleteCommandes = async (commandeId) => {
-    const commandesRef = doc(db, 'Ingredients', commandeId);
+    const commandesRef = doc(db, 'commandes', commandeId);
     await deleteDoc(commandesRef);
 };

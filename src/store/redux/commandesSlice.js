@@ -14,7 +14,7 @@ export const createCommande = createAsyncThunk(
 export const editCommande = createAsyncThunk(
     'commandes/edit',
     async ({ id, updates }) => {
-        await updateCommande(id, updates);
+        await updateCommandes(id, updates);
         return { id, updates };
     }
 );
@@ -22,7 +22,7 @@ export const editCommande = createAsyncThunk(
 export const removeCommande = createAsyncThunk(
     'commandes/delete',
     async (commandeID) => {
-        await deleteCommande(commandeID);
+        await deleteCommandes(commandeID);
         return commandeID;
     }
 );

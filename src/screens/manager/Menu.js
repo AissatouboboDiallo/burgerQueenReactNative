@@ -95,7 +95,7 @@ export default function Menu() {
         <ScrollView showsVerticalScrollIndicator={false} >
               <View style={{flexDirection:"column", gap:6,alignContent:"center", width:"100%"}}>
                 {produits.map((burger) => (
-                    <ListBurger  
+                  <ListBurger  
                    burger={burger}  key={burger.id}
                    burgerModal={burgerModal}
                    setburgerModal={setburgerModal} 
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#ebe9e5',
     borderRadius: 24,
     paddingHorizontal: 16,
     marginVertical: 20,

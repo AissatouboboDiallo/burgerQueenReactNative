@@ -1,23 +1,27 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ScrollView, ActivityIndicator, Alert } from 'react-native'
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Dropdown } from 'react-native-element-dropdown';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { createCommande } from '../../../../store/redux/commandesSlice';
 
-
 export default function ModalAjouterCommande({ visible, onClose }) {
-
-    const [nature, setNature] = useState('place'); // "place" | "export"
+    const [nature, setNature] = useState('place');
     const [numeroTable, setNumeroTable] = useState('');
     const [produitTemp, setProduitTemp] = useState(null);
     const [isFocusProduit, setIsFocusProduit] = useState(false);
-    const [plats, setPlats] = useState([]); // [{ produitId, label, nbre }]
+    const [plats, setPlats] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const dispatch = useDispatch();
-    const produits = useSelector((state) => state.produits.list);
+    const [dateCommande, setDateCommande] = useState(new Date());
+    const [heureCommande, setHeureCommande] = useState(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showTimePicker, setShowTimePicker] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
-    // On ne propose que les produits actuellement disponibles
+    const dispatch = useDispatch();
+    const produits = useSelector((state) => state.produits.list || []);
+
     const produitsDisponibles = produits.filter((p) => p.disponible);
 
     const resetForm = () => {
@@ -25,6 +29,11 @@ export default function ModalAjouterCommande({ visible, onClose }) {
         setNumeroTable('');
         setProduitTemp(null);
         setPlats([]);
+        setDateCommande(new Date());
+        setHeureCommande(new Date());
+        setShowDatePicker(false);
+        setShowTimePicker(false);
+        setErrorMessage('');
     };
 
     const handleClose = () => {
@@ -32,17 +41,10 @@ export default function ModalAjouterCommande({ visible, onClose }) {
         onClose();
     };
 
-    // Empêche la saisie de lettres dans le numéro de table
     const handleChangeNumeroTable = (value) => {
         const filtered = value.replace(/[^0-9]/g, '');
         setNumeroTable(filtered);
     };
-
-    const renderItem = (item) => (
-        <View style={styles.item} key={item.id}>
-            <Text style={styles.itemText}>{item.title}</Text>
-        </View>
-    );
 
     const handleAddPlat = (item) => {
         const dejaAjoute = plats.some((p) => p.produitId === item.id);
@@ -50,10 +52,7 @@ export default function ModalAjouterCommande({ visible, onClose }) {
             setIsFocusProduit(false);
             return;
         }
-        setPlats([
-            ...plats,
-            { produitId: item.id, label: item.title, nbre: 1 },
-        ]);
+        setPlats([...plats, { produitId: item.id, label: item.title, nbre: 1 }]);
         setProduitTemp(null);
         setIsFocusProduit(false);
     };
@@ -73,18 +72,57 @@ export default function ModalAjouterCommande({ visible, onClose }) {
     const handleDecrement = (produitId) => {
         setPlats(
             plats.map((p) =>
-                p.produitId === produitId && p.nbre > 1 ? { ...p, nbre: p.nbre - 1 } : p
+                p.produitId === produitId && p.nbre > 1
+                    ? { ...p, nbre: p.nbre - 1 }
+                    : p
             )
         );
     };
 
+    const handleDateConfirm = (date) => {
+        if (date) setDateCommande(date);
+        setShowDatePicker(false);
+    };
+
+    const handleTimeConfirm = (time) => {
+        if (time) setHeureCommande(time);
+        setShowTimePicker(false);
+    };
+
+    const isPastDateTime = (date, time) => {
+        const selected = new Date(date);
+        const hours = time.getHours();
+        const minutes = time.getMinutes();
+        selected.setHours(hours, minutes, 0, 0);
+        return selected < new Date();
+    };
+
+    const formatDate = (date) => {
+        return date.toLocaleDateString('fr-FR');
+    };
+
+    const formatTime = (time) => {
+        return time.toLocaleTimeString('fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
+
     const handleSubmit = async () => {
+        setErrorMessage('');
+
         if (nature === 'place' && !numeroTable) {
-            Alert.alert('Champ manquant', 'Merci de préciser le numéro de table.');
+            setErrorMessage('Merci de préciser le numéro de table.');
             return;
         }
+
         if (plats.length === 0) {
-            Alert.alert('Aucun plat', "Ajoute au moins un plat à la commande.");
+            setErrorMessage("Ajoute au moins un plat à la commande.");
+            return;
+        }
+
+        if (isPastDateTime(dateCommande, heureCommande)) {
+            setErrorMessage("Tu ne peux pas choisir une date ou une heure déjà passée.");
             return;
         }
 
@@ -94,17 +132,17 @@ export default function ModalAjouterCommande({ visible, onClose }) {
             const commandeData = {
                 numeroTable: nature === 'place' ? Number(numeroTable) : null,
                 nature,
-                statut: 'attente',
+                status: 'attente',
+                dateCommande: dateCommande.toISOString().split('T')[0],
+                heureCommande: heureCommande.toTimeString().slice(0, 5),
                 plats,
             };
-            console.log("commande data est : ", commandeData);
-            
 
             await dispatch(createCommande(commandeData)).unwrap();
             handleClose();
-            Alert.alert("Commande enregistrée avec succès !")
+            Alert.alert('Commande enregistrée avec succès !');
         } catch (error) {
-            Alert.alert('Erreur', "Impossible d'enregistrer la commande. Réessaie.");
+            setErrorMessage("Impossible d'enregistrer la commande. Réessaie.");
             console.error('Erreur enregistrement commande :', error);
         } finally {
             setLoading(false);
@@ -123,7 +161,6 @@ export default function ModalAjouterCommande({ visible, onClose }) {
                             </TouchableOpacity>
                         </View>
 
-                        {/* Nature de la commande */}
                         <Text style={styles.label}>Type de commande</Text>
                         <View style={styles.natureRow}>
                             <TouchableOpacity
@@ -144,7 +181,6 @@ export default function ModalAjouterCommande({ visible, onClose }) {
                             </TouchableOpacity>
                         </View>
 
-                        {/* Numéro de table — uniquement si "Sur place" */}
                         {nature === 'place' && (
                             <>
                                 <Text style={styles.label}>Numéro de table</Text>
@@ -159,7 +195,6 @@ export default function ModalAjouterCommande({ visible, onClose }) {
                             </>
                         )}
 
-                        {/* Sélection des plats */}
                         <View style={styles.container}>
                             <Text style={styles.label}>Choix des plats</Text>
                             <Dropdown
@@ -177,7 +212,11 @@ export default function ModalAjouterCommande({ visible, onClose }) {
                                 onFocus={() => setIsFocusProduit(true)}
                                 onBlur={() => setIsFocusProduit(false)}
                                 onChange={handleAddPlat}
-                                renderItem={renderItem}
+                                renderItem={(item) => (
+                                    <View style={styles.item} key={item.id}>
+                                        <Text style={styles.itemText}>{item.title}</Text>
+                                    </View>
+                                )}
                             />
 
                             {plats.length === 0 ? (
@@ -189,25 +228,16 @@ export default function ModalAjouterCommande({ visible, onClose }) {
                                             <Text style={styles.platName}>{item.label}</Text>
 
                                             <View style={styles.stepper}>
-                                                <TouchableOpacity
-                                                    style={styles.stepperButton}
-                                                    onPress={() => handleDecrement(item.produitId)}
-                                                >
+                                                <TouchableOpacity style={styles.stepperButton} onPress={() => handleDecrement(item.produitId)}>
                                                     <Text style={styles.stepperText}>–</Text>
                                                 </TouchableOpacity>
                                                 <Text style={styles.stepperValue}>{item.nbre}</Text>
-                                                <TouchableOpacity
-                                                    style={styles.stepperButton}
-                                                    onPress={() => handleIncrement(item.produitId)}
-                                                >
+                                                <TouchableOpacity style={styles.stepperButton} onPress={() => handleIncrement(item.produitId)}>
                                                     <Text style={styles.stepperText}>+</Text>
                                                 </TouchableOpacity>
                                             </View>
 
-                                            <TouchableOpacity
-                                                style={styles.removeButton}
-                                                onPress={() => handleRemovePlat(item.produitId)}
-                                            >
+                                            <TouchableOpacity style={styles.removeButton} onPress={() => handleRemovePlat(item.produitId)}>
                                                 <Text style={styles.removeButtonText}>✕</Text>
                                             </TouchableOpacity>
                                         </View>
@@ -216,7 +246,22 @@ export default function ModalAjouterCommande({ visible, onClose }) {
                             )}
                         </View>
 
-                        {/* Boutons */}
+                        <Text style={styles.label}>Date de commande</Text>
+                        <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)}>
+                            <Text>{formatDate(dateCommande)}</Text>
+                        </TouchableOpacity>
+
+                        <Text style={styles.label}>Heure de commande</Text>
+                        <TouchableOpacity style={styles.input} onPress={() => setShowTimePicker(true)}>
+                            <Text>{formatTime(heureCommande)}</Text>
+                        </TouchableOpacity>
+
+                        {errorMessage ? (
+                            <View style={styles.errorBox}>
+                                <Text style={styles.errorText}>{errorMessage}</Text>
+                            </View>
+                        ) : null}
+
                         <View style={styles.buttonRow}>
                             <TouchableOpacity style={styles.cancelButton} onPress={handleClose}>
                                 <Text style={styles.cancelText}>Annuler</Text>
@@ -232,6 +277,26 @@ export default function ModalAjouterCommande({ visible, onClose }) {
                     </ScrollView>
                 </View>
             </View>
+
+            <DateTimePickerModal
+                isVisible={showDatePicker}
+                mode="date"
+                minimumDate={new Date()}
+                onConfirm={handleDateConfirm}
+                onCancel={() => setShowDatePicker(false)}
+                isDarkModeEnabled={false}
+                themeVariant="light"
+            />
+
+            <DateTimePickerModal
+                isVisible={showTimePicker}
+                mode="time"
+                onConfirm={handleTimeConfirm}
+                onCancel={() => setShowTimePicker(false)}
+                style={{color:"#000"}}
+                isDarkModeEnabled={false}
+                 themeVariant="light"
+            />
         </Modal>
     );
 }
@@ -315,4 +380,17 @@ const styles = StyleSheet.create({
     cancelText: { fontSize: 16, fontWeight: 'bold', color: '#070707' },
     addButton: { flex: 1, backgroundColor: '#F5A623', borderRadius: 30, paddingVertical: 16, justifyContent: 'center', alignItems: 'center' },
     addText: { fontSize: 16, fontWeight: '600', color: '#fff' },
+    errorBox: {
+    backgroundColor: '#FEF2F2',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#FCA5A5',
+},
+errorText: {
+    color: "#EF4444",
+    fontSize: 14,
+    fontWeight: '600',
+},
 });

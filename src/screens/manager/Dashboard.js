@@ -1,6 +1,5 @@
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { View, Text, StyleSheet } from 'react-native';
 import StockSection from './Components/Dashboard/StockSection';
 import { ScrollView } from 'react-native';
@@ -9,6 +8,11 @@ import AperçuCuisine from './Components/Dashboard/AperçuCuisine';
 import { useEffect } from 'react';
 import { db } from '../../../firebaseConfig';
 import { getDoc,getDocs,collection } from 'firebase/firestore';
+import { useDispatch, useSelector } from 'react-redux';
+import { subscribeToCommandes } from '../../services/commandesServices';
+import { setCommandesRealtime } from '../../store/redux/commandesSlice';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 export default function Dashboard() {
 
@@ -21,6 +25,20 @@ export default function Dashboard() {
     day: "numeric"     // 14
   });
 
+    const dispatch = useDispatch()
+      const commandes = useSelector((state) => state.commandes.list);
+     
+         useEffect(() => {
+             // On démarre l'écoute au montage de l'écran
+             const unsubscribe = subscribeToCommandes((commandesData) => {
+                 dispatch(setCommandesRealtime(commandesData));
+             });
+     
+             // On arrête l'écoute quand l'écran se démonte (bonne pratique, évite les fuites mémoire)
+             return () => unsubscribe();
+         }, []);
+   
+     const commandesAttentes = commandes.filter((cmd) => cmd.status ==="attente"  )
   return (
     <View style={styles.container}>
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -29,7 +47,7 @@ export default function Dashboard() {
            <View style={styles.top}>
             <Text style={styles.title}>Bonjour, Manager 👑</Text>
             <View style={styles.circle}>
-              <MaterialCommunityIcons name="bell" size={20} color="#f4b60b" />
+              <MaterialCommunityIcons name="bell-outline" size={20} color="#f4b60b" />
             </View>
           </View>
          </View>
@@ -42,7 +60,7 @@ export default function Dashboard() {
                   <MaterialCommunityIcons name="trending-up" size={20} color="#10B981" />
                 </View>
               </View>
-                 <Text style={styles.cardTextUnique}>1240 $</Text>
+                 <Text style={styles.cardTextUnique}>1.200.000 FG</Text>
                  <Text style={styles.textUnique}>+12% vs hier</Text>
     
             </View>
@@ -54,7 +72,7 @@ export default function Dashboard() {
                   <MaterialCommunityIcons name="clock-outline" size={20} color="#F59E0B" />
                 </View>
               </View>
-                 <Text style={styles.cardText}>8 </Text>
+                 <Text style={styles.cardText}>{commandesAttentes.length} </Text>
                  <Text style={styles.text}>commandes actives</Text>
     
             </View>
@@ -78,8 +96,8 @@ export default function Dashboard() {
                   <MaterialCommunityIcons name="package-variant" size={20} color="#420bf5" />
                 </View>
               </View>
-                 <Text style={styles.cardText}>8.67$ </Text>
-                 <Text style={[styles.text , styles.colorPurple]}>+0.40 $</Text>
+                 <Text style={styles.cardText}>30.000 FG </Text>
+                 <Text style={[styles.text , styles.colorPurple]}>+10.000 FG</Text>
             </View>
             
           </View>

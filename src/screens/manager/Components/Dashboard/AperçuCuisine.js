@@ -2,8 +2,26 @@ import React from 'react'
 import { View , Text , StyleSheet, TouchableOpacity} from 'react-native' 
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { subscribeToCommandes } from '../../../../services/commandesServices';
+import { setCommandesRealtime } from '../../../../store/redux/commandesSlice';  
+import { useDispatch , useSelector } from 'react-redux';
+import { useEffect } from 'react';
 
 export default function AperçuCuisine() {
+   const dispatch = useDispatch()
+   const commandes = useSelector((state) => state.commandes.list);
+  
+      useEffect(() => {
+          // On démarre l'écoute au montage de l'écran
+          const unsubscribe = subscribeToCommandes((commandesData) => {
+              dispatch(setCommandesRealtime(commandesData));
+          });
+  
+          // On arrête l'écoute quand l'écran se démonte (bonne pratique, évite les fuites mémoire)
+          return () => unsubscribe();
+      }, []);
+
+  const commandesAttentes = commandes.filter((cmd) => cmd.status ==="attente"  )
   return (
     <View style={styles.container}>
          <View style={styles.directionRow}>
@@ -12,7 +30,7 @@ export default function AperçuCuisine() {
           </View>
           <View style={{flexDirection:"column", alignContent:"center"}}>
             <Text style={styles.title}>
-                8 commandes en  cours
+                {commandesAttentes.length} commandes en  cours
             </Text>
             <Text style={styles.stockLabel}>
                 Temps moyen : 6 min 42 s

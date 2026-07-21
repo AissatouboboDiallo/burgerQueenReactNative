@@ -5,25 +5,25 @@ import {getMinutesElapsed} from '../../../../store/cuisineActions'
 import { cuisineCommandeActions } from './ActionsCuisine';
 
 
-export default function CardPretes({cmdPrete}) {
-  const {handleUpdateCmd , formatDeliveryDate, formatDeliveryTime } = cuisineCommandeActions()
+export default function CardServi({cmdServi}) {
+  const {formatDeliveryDate, formatDeliveryTime } = cuisineCommandeActions()
   return (
     <View style={styles.card}>
                   <View style={{flexDirection:"row" , gap:6,alignItems:"center",marginBottom:10}} >
                       <View style ={styles.circleDot} />
-                      <Text style={[styles.cardText , {textTransform: 'uppercase'}]}>  Prêtes </Text>
+                      <Text style={[styles.cardText , {textTransform: 'uppercase'}]}>  Servi </Text>
                   </View>
                   <View style={{flexDirection:"row", justifyContent:"space-between"}}>
                       <View>
-                         <Text style={styles.cardTitle}> {cmdPrete.nature ==="place" ? `Table n°${cmdPrete.numeroTable}` : "A Exporter"} </Text>
-                        <Text style={{color:"#aeaeae"}}>{ `C-${cmdPrete.id}`}</Text>
+                         <Text style={styles.cardTitle}> {cmdServi.nature ==="place" ? `Table n°${cmdServi.numeroTable}` : "A Exporter"} </Text>
+                        <Text style={{color:"#aeaeae"}}>{ `C-${cmdServi.id}`}</Text>
                       </View>
                       <View style ={styles.circle}>
-                          <Text> {`il y a ${getMinutesElapsed(cmdPrete.updatedAt)}`}</Text>
+                          <Text> {`il y a ${getMinutesElapsed(cmdServi.updatedAt)}`}</Text>
                       </View>
                   </View>
                   <View style={{flexDirection:"column" , gap:6,marginVertical:20}}>
-                      {cmdPrete.plats.map((plat, index) => (
+                      {cmdServi.plats.map((plat, index) => (
                           <View key={index} style={{flexDirection:"row", gap:6, alignItems:"center",marginBottom:10}}>
                               <View style={[styles.circleDot , {width:5, height:5}]} />
                               <Text style={styles.cardText}> {plat.nbre}x {plat.label} </Text>
@@ -31,25 +31,10 @@ export default function CardPretes({cmdPrete}) {
                       ))}
           
                   </View>
-                  <View style={styles.deliveryBox}>
-                          <View style={styles.deliveryHeader}>
-                            <MaterialCommunityIcons name="clock-outline" size={18} color="#F59E0B" />
-                            <Text style={styles.deliveryLabel}>Livraison prévue</Text>
-                          </View>
-                  
-                          <View style={styles.deliveryContent}>
-                            <Text style={styles.deliveryDate}>
-                              {formatDeliveryDate(cmdPrete.dateCommande)}
-                            </Text>
-                            <Text style={styles.deliveryTime}>
-                              à {formatDeliveryTime(cmdPrete.heureCommande)}
-                            </Text>
-                          </View>
-                          </View>
           
-                  <TouchableOpacity style={styles.buttonCard} onPress={() => handleUpdateCmd(cmdPrete.id, 'servi')} > 
+                  <TouchableOpacity style={styles.buttonCard}  > 
                       <MaterialCommunityIcons name="silverware-fork-knife" size={20} color="#eef2fa" />
-                      <Text style = {[styles.cardText, {fontWeight:"bold" , color:"#fff",fontSize:18}]}> Prête à servir </Text>
+                      <Text style = {[styles.cardText, {fontWeight:"bold" , color:"#fff",fontSize:18}]}> Déjà Servi </Text>
           
                   </TouchableOpacity>
           
