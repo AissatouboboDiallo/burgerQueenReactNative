@@ -31,7 +31,9 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "@react-native-google-signin/google-signin"
+      "@react-native-google-signin/google-signin",
+      "expo-font",
+      "@react-native-community/datetimepicker"
     ],
     "extra": {
       "eas": {
@@ -41,6 +43,5 @@
     "runtimeVersion": {
       "policy": "appVersion"
     }
-    
   }
 }
