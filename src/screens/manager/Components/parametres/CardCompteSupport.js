@@ -2,7 +2,7 @@ import React from 'react'
 import { View, Text, Switch, StyleSheet, TouchableOpacity } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function CardCompteSupport({compteSupport}) {
+export default function CardCompteSupport({compteSupport, setModalVisible}) {
   return (
     <View style={styles.container}>
         <View style={styles.direction}>
@@ -18,9 +18,10 @@ export default function CardCompteSupport({compteSupport}) {
                 </Text>
             </View>
         </View>
-            <TouchableOpacity> 
+            <TouchableOpacity onPress={() => setModalVisible(true)}> 
                 <MaterialCommunityIcons name="chevron-right" size={20} color="#000" />
-            </TouchableOpacity>                         
+            </TouchableOpacity>  
+
              
     </View>
   )

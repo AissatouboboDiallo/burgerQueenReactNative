@@ -2,6 +2,7 @@ import React from 'react'
 import { Text , View , TouchableOpacity , StyleSheet} from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch, useSelector } from 'react-redux';
+import ModalModifInfoUser from './ModalModifInfoUser';
 
 
 export default function Profil() {
@@ -17,6 +18,7 @@ export default function Profil() {
                 </View>
                 <View style={styles.infoUser}>
                     <Text style={styles.title}> {user?.nom}</Text>
+                    <Text style={styles.label}> {user?.email}</Text>
                     <View style={[styles.circleDot, {backgroundColor:"#ffe2b0", height:30, width:100,}]}>
                         <Text> 
                            { user?.role}
@@ -26,9 +28,7 @@ export default function Profil() {
                 </View>
 
             </View>
-            <TouchableOpacity style={[styles.circleDot, {height:50, width:50}]}>
-                    <MaterialCommunityIcons name="pencil-outline" size={20} color="#000000" />                        
-            </TouchableOpacity>
+            
         </View>
     </View>
   )
@@ -63,10 +63,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     
   } ,
+  label: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#4B5563',
+    letterSpacing: 0.5,
+  },
   title: {  
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
     color: '#070707',
     textTransform: 'uppercase',
   } ,

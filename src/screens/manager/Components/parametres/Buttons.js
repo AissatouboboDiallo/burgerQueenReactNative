@@ -1,28 +1,47 @@
-import React from 'react'
-import { Text , View, TouchableOpacity , StyleSheet } from 'react-native'
+import React, { useState } from 'react'
+import { Text, View, TouchableOpacity, StyleSheet, Alert } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { parametreActions } from './parametreActions';
 import { useAuthActions } from '../../../../store/useAuthActions';
-import { useDispatch,useSelector } from 'react-redux';
-
-
+import { useSelector } from 'react-redux';
+import ModalConfirmMotPass from './ModalConfirmMotPass';
 export default function Buttons() {
-  const {logoutUser} = parametreActions()
-  const {handleDeleteAccount} = useAuthActions()
+  const { logoutUser } = parametreActions();
+  const { handleDeleteAccount } = useAuthActions();
+  const user = useSelector((state) => state.auth.user);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const user = useSelector((state) => state.auth.user)
-  
+  const confirmerSuppression = async (password) => {
+    try {
+      await handleDeleteAccount(user.email, password);
+      setModalVisible(false);
+    } catch (error) {
+      Alert.alert('Erreur', "Mot de passe incorrect ou erreur de suppression. Réessaie.");
+      console.error('Erreur suppression compte :', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-        <TouchableOpacity style={styles.card}  onPress={logoutUser}  >
-              <MaterialCommunityIcons name="logout" size={20} color="#000000" />                         
+        <TouchableOpacity style={styles.card} onPress={logoutUser}>
+              <MaterialCommunityIcons name="logout" size={20} color="#000000" />
               <Text style={styles.title}> Se déconnecter </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.card, {backgroundColor:"rgb(255, 185, 185)"}]} onPress={() => handleDeleteAccount(user.email,user.password)}  >
-              <MaterialCommunityIcons name="account-remove-outline" size={20} color="#f70808" />                         
-              <Text style={[styles.title, {color:"#f00"}]}> Supprimer le compte </Text>
+        <TouchableOpacity 
+            style={[styles.card, { backgroundColor: "rgb(255, 185, 185)" }]} 
+            onPress={() => setModalVisible(true)}
+        >
+              <MaterialCommunityIcons name="account-remove-outline" size={20} color="#f70808" />
+              <Text style={[styles.title, { color: "#f00" }]}> Supprimer le compte </Text>
         </TouchableOpacity>
-        <Text style={{alignSelf:"center", marginTop:30}}> BurgerQueen . Fait avec 🍔 pour votre équipe</Text>
+        <Text style={{ alignSelf: "center", marginTop: 30 }}> BurgerQueen • Fait avec 🍔 pour votre équipe</Text>
+
+        <ModalConfirmMotPass
+            visible={modalVisible}
+            onClose={() => setModalVisible(false)}
+            onModif={confirmerSuppression}
+            text="suppression"
+        />
     </View>
   )
 }

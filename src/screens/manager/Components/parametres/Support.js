@@ -2,8 +2,11 @@ import React from 'react'
 import { Text , View, StyleSheet } from 'react-native'
 import CardCompteSupport from './CardCompteSupport'
 import { support } from '../../../../data'
+import ModalAPropos from './ModalAPropos'
+import { useState } from 'react'
 
 export default function Support() {
+  const [modalPropos, setmodalPropos] =useState(false)
   return (
     <View>
         <Text style={styles.cardTitle}>
@@ -13,7 +16,7 @@ export default function Support() {
         {
             support.map((supp, index) =>(
                 <View key={index}>
-                <CardCompteSupport compteSupport={supp} > </CardCompteSupport>
+                <CardCompteSupport compteSupport={supp} setModalVisible={setmodalPropos}> </CardCompteSupport>
                 { index != support.length -1 &&
                 <View style={styles.ligne} />           
                 }
@@ -21,9 +24,13 @@ export default function Support() {
                 </View>
             ))
         }
-
-
         </View>
+        <ModalAPropos
+        visible={modalPropos}
+        setModalVisible={setmodalPropos}
+        onClose={() => setmodalPropos(false)}
+        
+        />
     </View>
   )
 }

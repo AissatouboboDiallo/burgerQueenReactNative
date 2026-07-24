@@ -5,6 +5,10 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import {doc,updateDoc} from 'firebase/firestore';
 import {auth, db } from '../../firebaseConfig';
 import { deleteUserAccount } from '../services/autServices';
+import { updateUserInfo } from '../services/autServices';
+import { updateUserEmail } from '../services/autServices';
+import { updateUserPassword } from '../services/autServices';
+
 
 export function useAuthActions() {
   const dispatch = useDispatch();
@@ -121,6 +125,10 @@ const handleVerifyCode = async (uid, codeEntreParLUtilisateur) => {
             return 'Trop de tentatives. Merci de patienter quelques minutes avant de réessayer.';
         case 'auth/internal-error':
             return "Une erreur interne est survenue. Réessaie dans un instant.";
+        case 'auth/wrong-password':
+          return "Le mot de passe saisie est incorrect "
+        case 'auth/invalid-credential':
+           return "Le mot de passe saisie est incorrect "         
         default:
             return "Une erreur inattendue est survenue . Réessaie.";
     }
@@ -128,30 +136,65 @@ const handleVerifyCode = async (uid, codeEntreParLUtilisateur) => {
 
 
 const handleDeleteAccount = async (email, password) => {
-    Alert.alert(
-        'Supprimer le compte',
-        'Cette action est irréversible. Es-tu sûre de vouloir continuer ?',
-        [
-            { text: 'Annuler', style: 'cancel' },
-            {
-                text: 'Supprimer',
-                style: 'destructive',
-                onPress: async () => {
+   
                     try {
                         await deleteUserAccount(email, password);
                         Alert.alert('Compte supprimé avec succès.');
                         // rediriger vers l'écran de connexion
+                        dispatch(logout())
                     } catch (error) {
                         const message = getFirebaseErrorMessage(error.code);
                         Alert.alert('Erreur', message);
                     }
-                },
-            },
-        ]
-    );
+                
+};
+
+const handleModifInfoUser = async (newEmail, nom,password) => {
+   
+try {
+  const updates={
+    nom:nom,
+  }
+  await updateUserInfo(updates) ;
+  await updateUserEmail(password,newEmail) ;
+  Alert.alert("Modification de profil réussi ")
+  
+} catch (error) {
+  const message = getFirebaseErrorMessage(error.code)
+  Alert.alert('Erreur',message)
+
+  
+}
+
+
+                
+};
+
+const handleModifMotPass = async (currentPassword, newPassword) => {
+   
+try {
+
+  await updateUserPassword(currentPassword,newPassword) ;
+  Alert.alert("Modification de mot de pass réussi ")
+  
+} catch (error) {
+  const message = getFirebaseErrorMessage(error.code)
+  Alert.alert('Erreur',message)
+
+  
+}
+
+
+                
+};
+
+ const handleChangeNom = (value) => {
+    // Autorise uniquement les lettres (avec accents), espaces, tirets et apostrophes
+    const filtered = value.replace(/[^a-zA-ZÀ-ÿ\s'-]/g, '');
+    return filtered;
 };
 
   // On retourne la fonction pour que les composants puissent l'utiliser
-  return {handleLogin, handleVerifyCode, getFirebaseErrorMessage, handleDeleteAccount };
+  return {handleLogin, handleVerifyCode, getFirebaseErrorMessage, handleDeleteAccount,handleModifInfoUser, handleModifMotPass, handleChangeNom };
 
 }
