@@ -4,8 +4,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Dropdown } from 'react-native-element-dropdown';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { createCommande } from '../../../../store/redux/commandesSlice';
+import { useEffect } from 'react'; 
 
-export default function ModalAjouterCommande({ visible, onClose }) {
+export default function ModalAjouterCommande({ visible, onClose,produitPreselectionne }) {
+    
     const [nature, setNature] = useState('place');
     const [numeroTable, setNumeroTable] = useState('');
     const [produitTemp, setProduitTemp] = useState(null);
@@ -24,11 +26,37 @@ export default function ModalAjouterCommande({ visible, onClose }) {
 
     const produitsDisponibles = produits.filter((p) => p.disponible);
 
+    // Calcule le montant total de la commande à partir des plats sélectionnés
+    const calculerTotal = () => {
+        return plats.reduce((total, plat) => {
+            const produit = produits.find((p) => p.id === plat.produitId);
+            const prixUnitaire = produit ? produit.price : 0;
+            return total + prixUnitaire * plat.nbre;
+        }, 0);
+    };
+
+    const montantTotal = calculerTotal();
+
+    useEffect(() => {
+    if (!visible) return;
+
+    if (produitPreselectionne) {
+        setPlats([
+            {
+                produitId: produitPreselectionne.id,
+                label: produitPreselectionne.title,
+                nbre: 1,
+            },
+        ]);
+    } else {
+        setPlats([]);
+    }
+    }, [visible, produitPreselectionne]);
+
     const resetForm = () => {
         setNature('place');
         setNumeroTable('');
         setProduitTemp(null);
-        setPlats([]);
         setDateCommande(new Date());
         setHeureCommande(new Date());
         setShowDatePicker(false);
@@ -136,6 +164,8 @@ export default function ModalAjouterCommande({ visible, onClose }) {
                 dateCommande: dateCommande.toISOString().split('T')[0],
                 heureCommande: heureCommande.toTimeString().slice(0, 5),
                 plats,
+                total: Number(montantTotal.toFixed(2)),   // 🔧 ajouté
+
             };
 
             await dispatch(createCommande(commandeData)).unwrap();
@@ -242,6 +272,14 @@ export default function ModalAjouterCommande({ visible, onClose }) {
                                             </TouchableOpacity>
                                         </View>
                                     ))}
+                                </View>
+                            )}
+
+                            {/* 🔧 Nouveau bloc : total de la commande */}
+                            {plats.length > 0 && (
+                                <View style={styles.totalRow}>
+                                    <Text style={styles.totalLabel}>Total de la commande</Text>
+                                    <Text style={styles.totalValue}>{montantTotal.toFixed(2)} GNF</Text>
                                 </View>
                             )}
                         </View>
@@ -392,5 +430,26 @@ errorText: {
     color: "#EF4444",
     fontSize: 14,
     fontWeight: '600',
+},
+totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFF5E5',
+    borderRadius: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    marginTop: 14,
+    marginBottom: 6,
+},
+totalLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#070707',
+},
+totalValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#F5A623',
 },
 });

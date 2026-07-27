@@ -1,6 +1,6 @@
 import { Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
-import {logout} from './authSlice';
+import {logout , updateUser} from './authSlice';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import {doc,updateDoc} from 'firebase/firestore';
 import {auth, db } from '../../firebaseConfig';
@@ -8,6 +8,7 @@ import { deleteUserAccount } from '../services/autServices';
 import { updateUserInfo } from '../services/autServices';
 import { updateUserEmail } from '../services/autServices';
 import { updateUserPassword } from '../services/autServices';
+
 
 
 export function useAuthActions() {
@@ -157,6 +158,7 @@ try {
   }
   await updateUserInfo(updates) ;
   await updateUserEmail(password,newEmail) ;
+  dispatch(updateUser({ nom:nom, email:newEmail }));
   Alert.alert("Modification de profil réussi ")
   
 } catch (error) {
@@ -193,8 +195,13 @@ try {
     const filtered = value.replace(/[^a-zA-ZÀ-ÿ\s'-]/g, '');
     return filtered;
 };
+const roleFormat =(user) =>  ( 
+  user?.role 
+    ? user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase()
+    : '?'
+)
 
   // On retourne la fonction pour que les composants puissent l'utiliser
-  return {handleLogin, handleVerifyCode, getFirebaseErrorMessage, handleDeleteAccount,handleModifInfoUser, handleModifMotPass, handleChangeNom };
+  return {handleLogin, handleVerifyCode, getFirebaseErrorMessage, handleDeleteAccount,handleModifInfoUser, handleModifMotPass, handleChangeNom, roleFormat };
 
 }

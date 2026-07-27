@@ -19,7 +19,7 @@ export default function CardServi({cmdServi}) {
                         <Text style={{color:"#aeaeae"}}>{ `C-${cmdServi.id}`}</Text>
                       </View>
                       <View style ={styles.circle}>
-                          <Text> {`il y a ${getMinutesElapsed(cmdServi.updatedAt)}`}</Text>
+                          <Text> {`${getMinutesElapsed(cmdServi.updatedAt)}`}</Text>
                       </View>
                   </View>
                   <View style={{flexDirection:"column" , gap:6,marginVertical:20}}>
@@ -30,6 +30,10 @@ export default function CardServi({cmdServi}) {
                           </View>
                       ))}
           
+                  </View>
+                  <View style={styles.totalRow}>
+                      <Text style={styles.totalLabel}>Total de la commande</Text>
+                      <Text style={styles.totalValue}>{cmdServi.total} GNF</Text>
                   </View>
           
                   <TouchableOpacity style={styles.buttonCard}  > 
@@ -164,4 +168,25 @@ deliveryTime: {
   fontSize: 15,
   color: '#374151',
 },
-          })
+totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#e6fdf5',
+    borderRadius: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    marginTop: 14,
+    marginBottom: 6,
+},
+totalLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#070707',
+},
+totalValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#10B981',
+},
+})

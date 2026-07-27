@@ -1,6 +1,6 @@
 // redux/produitSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { addCommande , updateCommandes, subscribeToCommandes,deleteCommandes, searchCommandes } from '../../services/commandesServices';
+import { addCommande , updateCommande, subscribeToCommandes,deleteCommandes, searchCommandes } from '../../services/commandesServices';
 // Thunk = une action asynchrone (car parler à Firestore prend du temps)
 
 export const createCommande = createAsyncThunk(
@@ -14,7 +14,7 @@ export const createCommande = createAsyncThunk(
 export const editCommande = createAsyncThunk(
     'commandes/edit',
     async ({ id, updates }) => {
-        await updateCommandes(id, updates);
+        await updateCommande(id, updates);
         return { id, updates };
     }
 );

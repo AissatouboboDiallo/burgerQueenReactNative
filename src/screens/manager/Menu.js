@@ -9,14 +9,16 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ModalAjouterBurger from './Components/Menu/ModalAjouterBurger';
 import { useEffect } from 'react';
 import { setProduitsRealtime, createProduit, editProduit } from '../../store/redux/produitsSlice';
+import { subscribeTocategories } from '../../services/categoriesServices';
+import { setCategoriesRealtime } from '../../store/redux/categoriesSlice';
 import { subscribeToProduits,  } from '../../services/produitsServices';
 import { useDispatch , useSelector } from 'react-redux';
 import { Alert } from 'react-native';
 export default function Menu() {
 
   const [search, setSearch] = useState('')
-   const [modalVisible, setModalVisible] = useState(false);
    const [modalEdit, setmodalEdit] = useState(false);
+   const [modalVisible, setModalVisible] = useState(false);
    const [burgerModal,setburgerModal] = useState(null)
    const  [loading,setLoading] =useState(false)
     
@@ -54,58 +56,91 @@ export default function Menu() {
 
     const dispatch = useDispatch();
     const produits = useSelector((state) => state.produits.list);
+    const categories = useSelector((state) => state.categories.list);
 
     useEffect(() => {
         // On démarre l'écoute au montage de l'écran
         const unsubscribe = subscribeToProduits((produitsData) => {
             dispatch(setProduitsRealtime(produitsData));
         });
+        const unsubscribeCat = subscribeTocategories((categoriesData) => {
+            dispatch(setCategoriesRealtime(categoriesData));
+        });
 
         // On arrête l'écoute quand l'écran se démonte (bonne pratique, évite les fuites mémoire)
-        return () => unsubscribe();
+        return () => {
+          unsubscribe();
+          unsubscribeCat();        
+        }
     }, []);
+    // Normalise le texte pour une recherche fiable (ignore majuscules/minuscules et accents)
+const normalizeText = (text) => {
+    return text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, ''); // retire les accents
+};
 
 
   return (
     <View style={styles.container}>
          <ModelTitle title={"Gestion du menu"} littleTitle={"4 produits actifs sur 5"}  icons={"restaurant-outline"}></ModelTitle>
           <View style={styles.inputContainer}>
-                    <Text style={styles.inputIcon}>🔍</Text>
-                      <TextInput 
-                          style={styles.input}
-                          placeholder="Rechercher un burger, une catégorie"
-                          placeholderTextColor="#9CA3AF"
-                          value={search}
-                          onChangeText={setSearch}
-                          keyboardType="search"
-                          autoCapitalize="none"
-                      />
-          </View>
+                    <TextInput 
+                        style={styles.input}
+                        placeholder="Rechercher un plat, une catégorie"
+                        placeholderTextColor="#9CA3AF"
+                        value={search}
+                        onChangeText={setSearch}
+                        keyboardType="default"
+                        autoCapitalize="none"
+                    />
+            </View>
           <View style={{flexDirection:"row", justifyContent:"space-between", marginHorizontal:20, marginVertical:10}}>
-            <Text style={styles.title}>
-              Burgers
-            </Text>
-            <TouchableOpacity>
+            
+            <TouchableOpacity style={{flexDirection:"row", gap:6, justifyContent:"flex-end", flex:1}} >
+              <MaterialCommunityIcons name="sort" size={24} color="#F59E0B" />
               <Text>
-                 🔻Trier par catégorie
+                Trier par catégorie
               </Text>
             </TouchableOpacity>
           </View>
         <View style = {{width:"100%",height:500}}>
         <ScrollView showsVerticalScrollIndicator={false} >
-              <View style={{flexDirection:"column", gap:6,alignContent:"center", width:"100%"}}>
-                {produits.map((burger) => (
-                  <ListBurger  
-                   burger={burger}  key={burger.id}
-                   burgerModal={burgerModal}
-                   setburgerModal={setburgerModal} 
-                   setModalVisible = {setModalVisible}>
+          {categories.map((categorie) => {
+         const produitsFiltres = produits.filter((produit) => {
+        const appartientCategorie = produit.categoryId === categorie.id;
 
-                    
-                  </ListBurger>                  
+        if (!search.trim()) return appartientCategorie;
 
+        const searchNormalise = normalizeText(search);
+        const matchProduit = normalizeText(produit.title).includes(searchNormalise);
+        const matchCategorie = normalizeText(categorie.nom).includes(searchNormalise);
+
+        // Si la recherche correspond au nom de la catégorie, on affiche tous ses produits.
+        // Sinon, on affiche seulement les produits dont le titre correspond.
+        return appartientCategorie && (matchProduit || matchCategorie);
+    });
+
+    if (produitsFiltres.length === 0) return null;
+
+    return (
+        <View key={categorie.id}>
+            <Text style={styles.title}>{categorie.nom}</Text>
+            <View style={{ flexDirection: "column", gap: 6, alignContent: "center", width: "100%" }}>
+                {produitsFiltres.map((burger) => (
+                    <ListBurger
+                        burger={burger}
+                        key={burger.id}
+                        setburgerModal={setburgerModal}
+                        setModalVisible={setModalVisible}
+                    />
                 ))}
-              </View>
+            </View>
+        </View>
+    );
+})}
+              
         </ScrollView>
 
         </View>

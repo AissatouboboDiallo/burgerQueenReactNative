@@ -189,7 +189,7 @@ return (
           {/* CHAMP EMAIL (Commun) */}
           <Text style={styles.label}>EMAIL</Text>
           <View style={styles.inputContainer}>
-            <Text style={styles.inputIcon}>📧</Text>
+              <MaterialCommunityIcons name="email" size={20} color="black" />
             <TextInput 
               style={styles.input}
               placeholder="nom@restaurant.fr"
@@ -204,7 +204,7 @@ return (
           {/* CHAMP MOT DE PASSE (Commun) */}
           <Text style={styles.label}>MOT DE PASSE</Text>
           <View style={styles.inputContainer}>
-            <Text style={styles.inputIcon}>🔒</Text>
+            <MaterialCommunityIcons name="lock" size={20} color="black" />
             <TextInput 
               style={styles.input}
               placeholder="••••••••"
@@ -344,6 +344,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 20,
     height: 56,
+    gap:10
   },
   inputIcon: {
     fontSize: 18,

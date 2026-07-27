@@ -19,7 +19,7 @@ export default function CardPretes({cmdPrete}) {
                         <Text style={{color:"#aeaeae"}}>{ `C-${cmdPrete.id}`}</Text>
                       </View>
                       <View style ={styles.circle}>
-                          <Text> {`il y a ${getMinutesElapsed(cmdPrete.updatedAt)}`}</Text>
+                          <Text> {` ${getMinutesElapsed(cmdPrete.updatedAt)}`}</Text>
                       </View>
                   </View>
                   <View style={{flexDirection:"column" , gap:6,marginVertical:20}}>
@@ -31,9 +31,10 @@ export default function CardPretes({cmdPrete}) {
                       ))}
           
                   </View>
+                            
                   <View style={styles.deliveryBox}>
                           <View style={styles.deliveryHeader}>
-                            <MaterialCommunityIcons name="clock-outline" size={18} color="#F59E0B" />
+                            <MaterialCommunityIcons name="clock-outline" size={18} color="#10B981" />
                             <Text style={styles.deliveryLabel}>Livraison prévue</Text>
                           </View>
                   
@@ -45,7 +46,11 @@ export default function CardPretes({cmdPrete}) {
                               à {formatDeliveryTime(cmdPrete.heureCommande)}
                             </Text>
                           </View>
-                          </View>
+                          <View style={styles.totalRow}>
+                                    <Text style={styles.totalLabel}>Total de la commande</Text>
+                                    <Text style={styles.totalValue}>{cmdPrete.total} GNF</Text>
+                                </View>  
+                    </View>                
           
                   <TouchableOpacity style={styles.buttonCard} onPress={() => handleUpdateCmd(cmdPrete.id, 'servi')} > 
                       <MaterialCommunityIcons name="silverware-fork-knife" size={20} color="#eef2fa" />
@@ -143,10 +148,10 @@ export default function CardPretes({cmdPrete}) {
               position: 'relative',
               width:"100%"
             } , 
-            deliveryBox: {
-  backgroundColor: '#FFF7ED',
+  deliveryBox: {
+  backgroundColor: '#f4fefb',
   borderWidth: 1,
-  borderColor: '#FDE68A',
+  borderColor: '#89fcd6',
   borderRadius: 18,
   padding: 12,
   marginTop: 0,
@@ -161,7 +166,7 @@ deliveryHeader: {
 deliveryLabel: {
   fontSize: 13,
   fontWeight: '700',
-  color: '#92400E',
+  color: '#10B981',
   textTransform: 'uppercase',
 },
 deliveryContent: {
@@ -179,4 +184,6 @@ deliveryTime: {
   fontSize: 15,
   color: '#374151',
 },
-          })
+
+
+})

@@ -34,7 +34,7 @@ export const cuisineCommandeActions = () => {
             await dispatch(
                 editCommande({
                     id,
-                    updates: { status, updatedAt:serverTimestamp() }
+                    updates: {status}
                 })
             ).unwrap();
 

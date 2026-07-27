@@ -8,7 +8,7 @@ import { createProduit, editProduit } from '../../../../store/redux/produitsSlic
 import { useDispatch, useSelector } from 'react-redux';
 import { Dropdown } from 'react-native-element-dropdown';
 
-const EMOJIS = ['🍔', '🥓', '🧀', '🥑', '🌶️', '🍟', '🥪', '🌭'];
+const EMOJIS = ['🍔', '🍲' ,  '🍖','🍗',  '🍱', '🍯','🍦','🧁','🍧','🧋',   '🫓','🥞','🍕' , '🧃','🍾','🥤','🫗','🍵','🥛', '🥪','🌮','🥙','🥗','🌯'];
 
 // Calcule si le produit est disponible selon le stock actuel des ingrédients de sa recette
 const calculerDisponibilite = (recetteFormatee, ingredientsList) => {

@@ -42,6 +42,10 @@
     },
     "runtimeVersion": {
       "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/db69a6a4-e455-4328-a2e1-ecc538823d35",
+      "fallbackToCacheTimeout": 3000
     }
   }
 }

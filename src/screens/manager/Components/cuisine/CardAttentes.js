@@ -30,7 +30,7 @@ export default function CardAttentes({ cmdAttente }) {
                             <Text style={{ color: "#aeaeae" }}>{`C-${cmdAttente.id}`}</Text>
                         </View>
                         <View style={styles.circle}>
-                            <Text> {`il y a ${getMinutesElapsed(cmdAttente.createdAt)} `}</Text>
+                            <Text> {` ${getMinutesElapsed(cmdAttente.createdAt)} `}</Text>
                         </View>
                     </View>
                     <View style={{ flexDirection: "column", gap: 6, marginVertical: 20 }}>
@@ -46,7 +46,6 @@ export default function CardAttentes({ cmdAttente }) {
                             <MaterialCommunityIcons name="clock-outline" size={18} color="#F59E0B" />
                             <Text style={styles.deliveryLabel}>Livraison prévue</Text>
                         </View>
-
                         <View style={styles.deliveryContent}>
                             <Text style={styles.deliveryDate}>
                                 {formatDeliveryDate(cmdAttente.dateCommande)}
@@ -55,7 +54,12 @@ export default function CardAttentes({ cmdAttente }) {
                                 à {formatDeliveryTime(cmdAttente.heureCommande)}
                             </Text>
                         </View>
+                        <View style={styles.totalRow}>
+                                <Text style={styles.totalLabel}>Total de la commande</Text>
+                                <Text style={styles.totalValue}>{cmdAttente.total} GNF</Text>
+                        </View>
                     </View>
+                    
 
                     <TouchableOpacity style={styles.buttonCard} onPress={() => handleUpdateCmd(cmdAttente.id, 'cuisson')}>
                         <MaterialCommunityIcons name="silverware-fork-knife" size={20} color="#0f0f10" />
@@ -178,4 +182,23 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '600',
     },
+    totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFF5E5',
+    borderRadius: 20,
+    paddingVertical: 14,
+    marginBottom: 6,
+},
+totalLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#070707',
+},
+totalValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#F5A623',
+},
 });

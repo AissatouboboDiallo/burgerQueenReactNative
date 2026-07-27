@@ -7,12 +7,21 @@ import { Alert } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler'; 
 import { removeProduit } from '../../../../store/redux/produitsSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import ModalAjouterCommande from '../cuisine/ModalAjouterCommande';
 
 export default function ListBurger({burger, onEdit, setModalVisible, setburgerModal}) {
     const [toggle, setToggle] = useState(null)
     const [text,setText] = useState(false)
     const [showRupture,setshowRupture] = useState(!burger.disponible ? true : false)
+    const [visible,setVisible]=useState(false)
     const dispatch = useDispatch()
+    const [produitPourCommande, setProduitPourCommande] = useState(null);
+
+    // Quand on clique sur un burger dans le menu pour créer directement sa commande
+    const handleCommanderProduit = (produit) => {
+        setProduitPourCommande(produit);
+        setVisible(true);
+    };
 
      const handleEditBurger = (editBurger) => {
              // dispatch Redux ou update Firebase ici
@@ -94,15 +103,30 @@ const calculerDisponibilite = (recetteFormatee, ingredientsList) => {
            <Text style = {[styles.title, {marginBottom:0, marginTop:10}]} >
             {`${burger.price} GNF`}
            </Text>
+           <TouchableOpacity onPress={()=> handleCommanderProduit(burger)}>
+            <Text style={[styles.text, {padding:3, flex:1, fontStyle:"italic"}]}> 
+            cliquez pour commander
+           </Text>
+           </TouchableOpacity>
         </View>
         <View style = {styles.sectionButton}>
-        <Switch value={burger.disponible}  disabled={true}   />
+        <Switch value={burger.disponible}  
+        trackColor={{ false: "#ccc", true: "#FF8C00" }} // orange burger
+         />
         <TouchableOpacity style = {[styles.circle ,  {width:40, height:40}]}  onPress={() => handleEditBurger(burger)}> 
             <MaterialCommunityIcons name="pencil-outline" size={20} color="#000000" />
          </TouchableOpacity>
         </View>
        
     </View>
+    <ModalAjouterCommande
+    visible={visible}
+     onClose={() => {
+        setVisible(false);
+        setProduitPourCommande(null);   // 🔧 réinitialise ici aussi
+         }}
+    produitPreselectionne={produitPourCommande}
+    />
    </Swipeable>
   )
 }

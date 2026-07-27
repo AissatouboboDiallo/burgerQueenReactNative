@@ -1,6 +1,7 @@
 // redux/produitSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { addIngredient,updateIngredients,subscribeToIngredients,deleteIngredients } from '../../services/igredientsServices';
+import { addIngredient,updateIngredient,subscribeToIngredients,deleteIngredient } from '../../services/igredientsServices';
+
 
 // Thunk = une action asynchrone (car parler à Firestore prend du temps)
 

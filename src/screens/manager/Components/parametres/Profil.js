@@ -3,12 +3,13 @@ import { Text , View , TouchableOpacity , StyleSheet} from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalModifInfoUser from './ModalModifInfoUser';
+import { useAuthActions } from '../../../../store/useAuthActions';
 
 
 export default function Profil() {
   const user = useSelector((state) => state.auth.user)
    const initiale = user?.nom ? user.nom.charAt(0).toUpperCase() : '?';
-
+    const {roleFormat} =  useAuthActions()
   return (
     <View style = {styles.card}>
         <View style={styles.container}> 
@@ -19,9 +20,9 @@ export default function Profil() {
                 <View style={styles.infoUser}>
                     <Text style={styles.title}> {user?.nom}</Text>
                     <Text style={styles.label}> {user?.email}</Text>
-                    <View style={[styles.circleDot, {backgroundColor:"#ffe2b0", height:30, width:100,}]}>
+                    <View style={[styles.circleDot, {backgroundColor:"#ffecca", height:30, width:100,}]}>
                         <Text> 
-                           { user?.role}
+                           { roleFormat(user)}
                         </Text>
                     </View>
 

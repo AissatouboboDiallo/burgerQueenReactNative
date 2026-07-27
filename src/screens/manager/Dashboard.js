@@ -5,13 +5,15 @@ import StockSection from './Components/Dashboard/StockSection';
 import { ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AperçuCuisine from './Components/Dashboard/AperçuCuisine';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { db } from '../../../firebaseConfig';
 import { getDoc,getDocs,collection } from 'firebase/firestore';
 import { useDispatch, useSelector } from 'react-redux';
 import { subscribeToCommandes } from '../../services/commandesServices';
 import { setCommandesRealtime } from '../../store/redux/commandesSlice';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import TousIngredients from './Components/ingredients/TousIngredients';
+import { useAuthActions } from '../../store/useAuthActions';
 
 
 export default function Dashboard() {
@@ -26,7 +28,10 @@ export default function Dashboard() {
   });
 
     const dispatch = useDispatch()
-      const commandes = useSelector((state) => state.commandes.list);
+      const commandes = useSelector((state) => state.commandes.list || []);
+      const user = useSelector((state) => state.auth.user);
+      const {roleFormat} =  useAuthActions()
+      
      
          useEffect(() => {
              // On démarre l'écoute au montage de l'écran
@@ -39,13 +44,21 @@ export default function Dashboard() {
          }, []);
    
      const commandesAttentes = commandes.filter((cmd) => cmd.status ==="attente"  )
+      const commandesServis = commandes.filter((cmd) => cmd.status ==="servi"  )
+      const [affTousIngredients , setaffTousIngredients] = useState(false);
+           // Calcule le montant total de la commande à partir des plats sélectionnés
+    const chiffreAff = commandesAttentes.reduce(
+  (total, cmd) => total + Number(cmd?.total || 0),
+  0);
+
   return (
     <View style={styles.container}>
+      {!affTousIngredients && 
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.containerTop}>
             <Text style={styles.text}>{formattedDate} </Text>
            <View style={styles.top}>
-            <Text style={styles.title}>Bonjour, Manager 👑</Text>
+            <Text style={styles.title}>Bonjour, {roleFormat(user)} 👑</Text>
             <View style={styles.circle}>
               <MaterialCommunityIcons name="bell-outline" size={20} color="#f4b60b" />
             </View>
@@ -60,7 +73,7 @@ export default function Dashboard() {
                   <MaterialCommunityIcons name="trending-up" size={20} color="#10B981" />
                 </View>
               </View>
-                 <Text style={styles.cardTextUnique}>1.200.000 FG</Text>
+                 <Text style={styles.cardTextUnique}>{chiffreAff} FG</Text>
                  <Text style={styles.textUnique}>+12% vs hier</Text>
     
             </View>
@@ -84,7 +97,7 @@ export default function Dashboard() {
                   <MaterialCommunityIcons name="silverware-fork-knife" size={20} color="#3B82F6" />
                 </View>
               </View>
-                 <Text style={styles.cardText}>143 </Text>
+                 <Text style={styles.cardText}>{commandesServis.length} </Text>
                  <Text style={styles.text}>clients servis</Text>
     
             </View>
@@ -96,15 +109,19 @@ export default function Dashboard() {
                   <MaterialCommunityIcons name="package-variant" size={20} color="#420bf5" />
                 </View>
               </View>
-                 <Text style={styles.cardText}>30.000 FG </Text>
+                 <Text style={styles.cardText}>{chiffreAff / commandesAttentes.length} FG </Text>
                  <Text style={[styles.text , styles.colorPurple]}>+10.000 FG</Text>
             </View>
             
           </View>
-          <StockSection />
+          <StockSection setaffTousIngredients={setaffTousIngredients} />
           <AperçuCuisine />
           
         </ScrollView>
+      }
+      {affTousIngredients && 
+        <TousIngredients setaffTousIngredients={setaffTousIngredients} />
+      }
     </View>
   )
 }

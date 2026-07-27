@@ -41,9 +41,12 @@ export const subscribeToCommandes = (callback) => {
 };
 
 // UPDATE — modifier un Commandes existant
-export const updateCommandes = async (commandeId, updates) => {
-    const commandesRef = doc(db, 'commandes', commandeId);
-    await updateDoc(commandesRef, updates);
+export const updateCommande = async (commandeId, updates) => {
+    const commandeRef = doc(db, 'commandes', commandeId);
+    await updateDoc(commandeRef, {
+        ...updates,
+        updatedAt: serverTimestamp(),   // ⬅️ ajouté ICI uniquement, jamais ailleurs
+    });
 };
 
 // Search — modifier un Commandes existant

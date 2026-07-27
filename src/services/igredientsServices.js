@@ -36,13 +36,13 @@ export const subscribeToIngredients = (callback) => {
 };
 
 // UPDATE — modifier un Ingredients existant
-export const updateIngredients = async (ingredientId, updates) => {
-    const ingredientsRef = doc(db, 'Ingredients', ingredientId);
+export const updateIngredient = async (ingredientId, updates) => {
+    const ingredientsRef = doc(db, 'ingredients', ingredientId);
     await updateDoc(ingredientsRef, updates);
 };
 
 // DELETE — supprimer un Ingredients
-export const deleteIngredients = async (ingredientId) => {
-    const ingredientsRef = doc(db, 'Ingredients', ingredientId);
+export const deleteIngredient = async (ingredientId) => {
+    const ingredientsRef = doc(db, 'ingredients', ingredientId);
     await deleteDoc(ingredientsRef);
 };

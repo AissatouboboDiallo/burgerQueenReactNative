@@ -1,10 +1,14 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { mockIngredients } from '../../../../data'
+import { useDispatch, useSelector } from 'react-redux';
+import { setIngredientsRealtime } from '../../../../store/redux/ingredientsSlice';
+import { useEffect } from 'react';
+import { subscribeToIngredients } from '../../../../services/igredientsServices';
 
 // Calcule le pourcentage restant d'un ingrédient
 const getPourcentage = (item) => {
-    return Math.round((item.quantiteActuelle / item.quantiteMax) * 100);
+    const pct = Math.round((item.quantiteActuelle / item.quantiteMax) * 100);
+    return Math.max(0, Math.min(pct, 100));
 };
 
 // Détermine la couleur selon le niveau
@@ -14,13 +18,28 @@ const getColorProgress = (pct) => {
     return '#22C55E'; // vert - ok
 };
 
-export default function StockSection() {
 
-  // On identifie les ingrédients en rupture imminente (sous leur seuil d'alerte)
+export default function StockSection({setaffTousIngredients}) {
+      const dispatch = useDispatch();
+
+      const mockIngredients = useSelector((state) => state.ingredients.list);
+  
+      useEffect(() => {
+          // On démarre l'écoute au montage de l'écran
+          const unsubscribe = subscribeToIngredients((ingredientsData) => {
+              dispatch(setIngredientsRealtime(ingredientsData));
+          });
+  
+          // On arrête l'écoute quand l'écran se démonte (bonne pratique, évite les fuites mémoire)
+          return () => unsubscribe();
+      }, []);
+
+        // On identifie les ingrédients en rupture imminente (sous leur seuil d'alerte)
   const ingredientsEnAlerte = mockIngredients.filter((item) => {
       const pct = getPourcentage(item);
       return pct <= 20;
   });
+
 
   return (
     <View style={styles.card}>
@@ -39,7 +58,7 @@ export default function StockSection() {
           </View>
         
          </View>
-         <TouchableOpacity>
+         <TouchableOpacity onPress={() => setaffTousIngredients(true) }>
              <Text style={{ color: "#8B5CF6", fontWeight: "600" }}>
                 Tout voir
             </Text>
@@ -56,7 +75,7 @@ export default function StockSection() {
 
               {/* Nom + Pourcentage */}
               <View style={styles.stockHeader}>
-                <Text style={styles.stockLabel}>{item.label}</Text>
+                <Text style={styles.stockLabel}>{item.nom}</Text>
                 <Text style={[styles.stockPct, { color }]}>
                   {pct}%
                 </Text>
@@ -90,8 +109,8 @@ export default function StockSection() {
 }
 
 const styles = StyleSheet.create({
-  card:          { backgroundColor: '#fff', borderRadius: 20, padding: 16, marginBottom: 12, marginTop:280,shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 , 
-  marginHorizontal:10
+  card:          { backgroundColor: '#fff', borderRadius: 20, padding: 16, marginBottom: 12, marginTop:300,shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 , 
+  marginHorizontal:10, 
 
  },
   title:         { fontSize: 24, fontWeight: '700', color: '#111827', marginBottom: 5 },

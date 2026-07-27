@@ -31,7 +31,6 @@ export default function ModalModifInfoUser({visible, onClose, onModif}) {
                 await onModif(nom,email);
             } finally {
                 setLoading(false);
-                setPassword('');
             }
         };
 

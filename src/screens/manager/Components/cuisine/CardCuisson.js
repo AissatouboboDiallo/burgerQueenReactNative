@@ -30,7 +30,7 @@ export default function CardCuisson({ cmdCuisson }) {
                             <Text style={{ color: "#aeaeae" }}>{`C-${cmdCuisson.id}`}</Text>
                         </View>
                         <View style={styles.circle}>
-                            <Text> {`il y a ${getMinutesElapsed(cmdCuisson.updatedAt)}`}</Text>
+                            <Text> {` ${getMinutesElapsed(cmdCuisson.updatedAt)}`}</Text>
                         </View>
                     </View>
                     <View style={{ flexDirection: "column", gap: 6, marginVertical: 20 }}>

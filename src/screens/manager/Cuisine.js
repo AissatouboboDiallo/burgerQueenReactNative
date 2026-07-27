@@ -23,6 +23,8 @@ export default function Cuisine() {
       const dispatch = useDispatch()
       
       const commandes = useSelector((state) => state.commandes.list);
+      const [produitPourCommande, setProduitPourCommande] = useState(null);
+
 
         useEffect(() => {
             const unsubscribe = subscribeToCommandes((dataCommande) => {
@@ -30,6 +32,12 @@ export default function Cuisine() {
             });
             return () => unsubscribe();
         }, []);
+
+        // Pour ouvrir la modal SANS présélection (bouton "+" classique)
+        const handleNouvelleCommandeVide = () => {
+            setProduitPourCommande(null);
+            setModalCommandeVisible(true);
+        };
 
         const totalCommandes = commandes.length;
         const commandesEnAttente = commandes.filter((cmd) => cmd.status === 'attente').length;
@@ -85,14 +93,19 @@ export default function Cuisine() {
 
         <TouchableOpacity 
             style={styles.fab} 
-            onPress={() => setModalCommandeVisible(true)}
+            onPress={handleNouvelleCommandeVide}
         >
             <MaterialCommunityIcons name="plus" size={28} color="#fff" />
         </TouchableOpacity>
 
         <ModalAjouterCommande
             visible={modalCommandeVisible}
-            onClose={() => setModalCommandeVisible(false)}
+            onClose={() => {
+        setModalCommandeVisible(false);
+        setProduitPourCommande(null);   // 🔧 réinitialise ici aussi
+         }}
+        produitPreselectionne={produitPourCommande}
+
         />
 
        
