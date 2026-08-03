@@ -5,11 +5,19 @@ import { removeIngredient } from '../../../../store/redux/ingredientsSlice';
 import ingredientActions from './ingredientActions';
 import { useDispatch } from 'react-redux';
 
-export default function CardIngredient({ingredient}) {
+export default function CardIngredient({ingredient, setModalVisible, setIngredientModal}) {
     const {getColorProgress, getPourcentage} =ingredientActions()
     const pct = getPourcentage(ingredient);
     const color = getColorProgress(pct);
-    const dispatch = useDispatch()
+    const dispatch = useDispatch() ;
+
+    
+    const handleEditIngredient = (item) => {
+        setIngredientModal(item);
+        setModalVisible(true);
+    };
+    
+       
 
     const handleDelete = () => {
             Alert.alert(

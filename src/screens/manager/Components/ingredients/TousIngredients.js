@@ -4,10 +4,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { setIngredientsRealtime } from '../../../../store/redux/ingredientsSlice';
 import { subscribeToIngredients } from '../../../../services/igredientsServices';
-import ModalAjoutIngredient from './ModalAjoutIngredients';
 import { Swipeable } from 'react-native-gesture-handler';
 import CardIngredient from './CardIngredient';
 import ingredientActions from './ingredientActions';
+import ModalAjoutIngredient from './ModalAjoutIngredients';
 
 
 
@@ -15,9 +15,9 @@ export default function TousIngredients({ setaffTousIngredients }) {
     const dispatch = useDispatch();
     const ingredients = useSelector((state) => state.ingredients.list);
     const {getColorProgress, getPourcentage} = ingredientActions()
-
     const [modalVisible, setModalVisible] = useState(false);
     const [ingredientModal, setIngredientModal] = useState(null);
+
 
     useEffect(() => {
         const unsubscribe = subscribeToIngredients((ingredientsData) => {
@@ -27,17 +27,13 @@ export default function TousIngredients({ setaffTousIngredients }) {
     }, []);
 
     const ingredientsEnAlerte = ingredients.filter((item) => getPourcentage(item) <= 20);
-
-    const handleEditIngredient = (item) => {
-        setIngredientModal(item);
-        setModalVisible(true);
-    };
-
-    const handleAddIngredient = () => {
+    
+    
+     const handleAddIngredient = () => {
         setIngredientModal(null);
         setModalVisible(true);
     };
-       
+
     return (
         <View style={styles.card}>
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -61,7 +57,7 @@ export default function TousIngredients({ setaffTousIngredients }) {
                     
 
                     return (
-                        <CardIngredient key={ingredient.id} ingredient={ingredient}>
+                        <CardIngredient key={ingredient.id} ingredient={ingredient} setIngredientModal={setIngredientModal} setModalVisible={setModalVisible}>
 
                         </CardIngredient>
                         

@@ -28,6 +28,10 @@ export default function Menu() {
         
 
     };
+   const handleChangeTexteSeul = (value) => {
+    const filtered = value.replace(/[^a-zA-ZÀ-ÿ\s'-]/g, '');
+    setSearch(filtered);
+};
     const handleAddBurger = async (produitData) => {
         console.log("new produitData : ", produitData);
          try {
@@ -91,7 +95,7 @@ const normalizeText = (text) => {
                         placeholder="Rechercher un plat, une catégorie"
                         placeholderTextColor="#9CA3AF"
                         value={search}
-                        onChangeText={setSearch}
+                        onChangeText={handleChangeTexteSeul}
                         keyboardType="default"
                         autoCapitalize="none"
                     />

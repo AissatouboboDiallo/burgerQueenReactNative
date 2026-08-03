@@ -31,16 +31,23 @@ export default function ListBurger({burger, onEdit, setModalVisible, setburgerMo
 
      
          };
+    const ingredientList = useSelector((state) => state.ingredients.list)
+    
     // Calcule si le produit est disponible selon le stock actuel des ingrédients de sa recette
 const calculerDisponibilite = (recetteFormatee, ingredientsList) => {
-    return recetteFormatee.every((item) => {
-        const ingredient = ingredientsList.find((ing) => ing.id === item.ingredientId);
-        if (!ingredient) return false; // ingrédient introuvable = pas disponible par sécurité
-        return ingredient.quantiteActuelle >= item.quantiteUtilisee;
+    return recetteFormatee.some((item) => {
+        const ingredient = ingredientsList.find(
+            (ing) => ing.id === item.ingredientId
+        );
+
+        if (!ingredient) return false; // ou true selon ta logique métier
+
+        return ingredient.enRupture === true;
     });
 };
 
-    const truncateText = (text, maxLength = 25) => {
+
+    const truncateText = (text ,maxLength = 25) => {
         if (text.length <= maxLength) return text;
         return text.slice(0, maxLength) + '...';
     };
@@ -91,9 +98,10 @@ const calculerDisponibilite = (recetteFormatee, ingredientsList) => {
         <View style = {styles.contentBurger}>
             <View style={{flexDirection:"row",}}>
                 <Text style = {styles.title} >
-                    { showRupture ? truncateText(burger.title,7)  : burger.title}  
+                    {/* { burger.disponible ? truncateText(burger.title,7)  : burger.title}   */}
+                    {burger.title}
                </Text>
-               { showRupture && <Text style={{backgroundColor:"#ff9797",borderRadius:15,padding:5}}> Rupture  </Text> }
+               {/* { burger.disponible && <Text style={{backgroundColor:"#ff9797",borderRadius:15,padding:5}}> Rupture  </Text> } */}
             </View>            
             <TouchableOpacity onPress={() =>setText(!text) } style={styles.text} >
                 <Text>

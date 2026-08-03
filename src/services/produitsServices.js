@@ -8,6 +8,7 @@ import {
     deleteDoc,
     onSnapshot,
     serverTimestamp,
+    getDocs
 } from 'firebase/firestore';
 
 // Référence vers la collection "produits"
@@ -21,6 +22,7 @@ export const addProduit = async (produitData) => {
     });
     return docRef.id;
 };
+
 
 // READ — écoute en temps réel (à chaque changement dans Firestore, callback est rappelé)
 export const subscribeToProduits = (callback) => {
@@ -41,6 +43,31 @@ export const subscribeToProduits = (callback) => {
 export const updateProduit = async (produitId, updates) => {
     const produitRef = doc(db, 'produits', produitId);
     await updateDoc(produitRef, updates);
+};
+
+// Recalcule "disponible" pour TOUS les produits, selon le stock actuel des ingrédients
+export const recalculerDisponibiliteTousProduits = async () => {
+    const ingredientsSnap = await getDocs(collection(db, 'ingredients'));
+    const ingredients = ingredientsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+    const produitsSnap = await getDocs(collection(db, 'produits'));
+
+    const misesAJour = [];
+    produitsSnap.forEach((docSnap) => {
+        const produit = docSnap.data();
+        const recette = produit.recette || [];
+
+        const disponible = recette.every((r) => {
+            const ingredient = ingredients.find((i) => i.id === r.ingredientId);
+            return ingredient && ingredient.quantiteActuelle >= r.quantiteUtilisee;
+        });
+
+        if (produit.disponible !== disponible) {
+            misesAJour.push(updateDoc(doc(db, 'produits', docSnap.id), { disponible }));
+        }
+    });
+
+    await Promise.all(misesAJour);
 };
 
 // DELETE — supprimer un produit

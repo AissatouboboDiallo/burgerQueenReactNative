@@ -100,7 +100,7 @@ export default function StockSection({setaffTousIngredients}) {
       {ingredientsEnAlerte.length > 0 && (
         <View style={styles.alert}>
           <Text style={styles.alertText}>
-            ⚠️ Rupture imminente — {ingredientsEnAlerte.map(i => i.label).join(', ')}
+            ⚠️ Rupture imminente — {ingredientsEnAlerte.map(i => i.nom).join(', ')}
           </Text>
         </View>
       )}

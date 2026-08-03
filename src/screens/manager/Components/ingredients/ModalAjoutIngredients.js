@@ -141,6 +141,8 @@ export default function ModalAjoutIngredient({ visible, onClose, ingredient }) {
                 quantiteMax: qMax,
                 seuilAlerte: seuilAlerte ? Number(parseFloat(seuilAlerte).toFixed(3)) : 0,
                 categorieCompatible: categoriesCompatibles.map((c) => c.id),
+                enRupture: qActuelle <= (seuilAlerte ? Number(parseFloat(seuilAlerte).toFixed(3)) : 0),   // 🔧 ajouté
+
             };
 
             if (isEditMode) {
